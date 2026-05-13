@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumino — Minimal Desk Lamp</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f5f0;
+    --ink: #1a1814;
+    --muted: #8a8680;
+    --accent: #c8a96e;
+    --white: #ffffff;
+    --border: #e4e0d8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem 2.5rem;
+    background: rgba(247,245,240,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; transition: color .2s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink); color: var(--white);
+    padding: .55rem 1.4rem; border-radius: 100px;
+    font-size: 14px; text-decoration: none; font-weight: 500;
+    transition: background .2s;
+  }
+  .nav-cta:hover { background: #333; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 7rem 2.5rem 4rem;
+    gap: 4rem;
+  }
+  .hero-text { flex: 1; max-width: 520px; }
+  .hero-tag {
+    display: inline-block;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+  }
+  .hero-desc { color: var(--muted); font-size: 17px; line-height: 1.75; margin-bottom: 2rem; }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .btn-dark {
+    background: var(--ink); color: var(--white);
+    padding: .85rem 2rem; border-radius: 100px;
+    font-size: 15px; text-decoration: none; font-weight: 500;
+    transition: background .2s, transform .15s;
+  }
+  .btn-dark:hover { background: #333; transform: translateY(-1px); }
+  .btn-light {
+    color: var(--ink); font-size: 15px; text-decoration: none;
+    padding: .85rem 1.5rem; border: 1px solid var(--border); border-radius: 100px;
+    transition: border-color .2s;
+  }
+  .btn-light:hover { border-color: var(--muted); }
+
+  .hero-visual {
+    flex: 1; max-width: 480px;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .lamp-wrap {
+    width: 320px; height: 420px;
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    padding-bottom: 3rem;
+    position: relative; overflow: hidden;
+  }
+  .glow {
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(200,169,110,.25) 0%, transparent 70%);
+    border-radius: 50%;
+    transition: opacity .4s;
+    pointer-events: none;
+  }
+  .lamp-svg { position: relative; z-index: 2; }
+  .lamp-base {
+    width: 80px; height: 8px;
+    background: #d4cfc6; border-radius: 4px;
+    position: relative; z-index: 2;
+    margin-top: 1rem;
+  }
+  .lamp-price {
+    position: absolute; bottom: 1.2rem; right: 1.5rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: var(--ink);
+  }
+  .lamp-badge {
+    position: absolute; top: 1.2rem; left: 1.5rem;
+    background: var(--accent); color: var(--white);
+    font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+    padding: .3rem .75rem; border-radius: 100px;
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 5rem 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 12px; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 3rem; font-weight: 500;
+  }
+  .feat-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px; background: var(--border); border-radius: 16px; overflow: hidden;
+  }
+  .feat-card {
+    background: var(--bg); padding: 2rem 1.75rem;
+    transition: background .2s;
+  }
+  .feat-card:hover { background: var(--white); }
+  .feat-icon {
+    font-size: 1.75rem; margin-bottom: 1rem;
+  }
+  .feat-title { font-size: 15px; font-weight: 500; margin-bottom: .4rem; }
+  .feat-text { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* SPECS */
+  .specs {
+    padding: 5rem 2.5rem;
+    border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .specs-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1.5rem;
+  }
+  .specs-list { list-style: none; }
+  .specs-list li {
+    display: flex; justify-content: space-between;
+    padding: 1rem 0; border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .specs-list li:last-child { border-bottom: none; }
+  .specs-list .key { color: var(--muted); }
+  .specs-list .val { font-weight: 500; }
+
+  /* COLOR PICKER */
+  .color-section {
+    padding: 5rem 2.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .color-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; margin-bottom: .5rem;
+  }
+  .color-sub { color: var(--muted); font-size: 15px; margin-bottom: 2.5rem; }
+  .color-swatches { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+  .swatch {
+    width: 48px; height: 48px; border-radius: 50%; cursor: pointer;
+    border: 3px solid transparent; transition: border-color .2s, transform .15s;
+  }
+  .swatch:hover, .swatch.active { border-color: var(--ink); transform: scale(1.1); }
+  .swatch-name { margin-top: 1rem; font-size: 13px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 2.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--muted); flex-wrap: wrap; gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; }
+    .specs { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">Lumino</span>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#specs">Specs</a></li>
+    <li><a href="#colors">Colors</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Buy now — $129</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="hero-tag">New · 2026 Edition</span>
+    <h1 class="hero-title">Light,<br>redesigned<br>for focus.</h1>
+    <p class="hero-desc">Lumino is a minimal desk lamp with adjustable warm-to-cool color temperature. Designed for people who care about their workspace.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-dark">Shop now</a>
+      <a href="#features" class="btn-light">Learn more</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="lamp-wrap" id="lampCard">
+      <div class="glow" id="glow"></div>
+      <span class="lamp-badge">New</span>
+      <svg class="lamp-svg" width="80" height="200" viewBox="0 0 80 200">
+        <line x1="40" y1="180" x2="40" y2="80" stroke="#c8c3b8" stroke-width="3" stroke-linecap="round"/>
+        <line x1="40" y1="80" x2="20" y2="50" stroke="#c8c3b8" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="14" cy="46" rx="22" ry="10" fill="#d4cfc6" transform="rotate(-30 14 46)"/>
+        <ellipse cx="14" cy="42" rx="20" ry="8" fill="#e8e3db" transform="rotate(-30 14 42)"/>
+        <ellipse cx="14" cy="42" rx="12" ry="5" fill="#f5f0e8" id="lampGlow" transform="rotate(-30 14 42)" opacity="0.6"/>
+      </svg>
+      <div class="lamp-base"></div>
+      <span class="lamp-price">$129</span>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <p class="section-label">Why Lumino</p>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">☀️</div>
+      <div class="feat-title">Adaptive brightness</div>
+      <p class="feat-text">From 1% to 100% — smooth dimming with no flicker at any level.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌡️</div>
+      <div class="feat-title">Warm to cool</div>
+      <p class="feat-text">2700K warm evening light or 6500K daylight for focused work.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔋</div>
+      <div class="feat-title">USB-C charging</div>
+      <p class="feat-text">Charge your devices directly from the base — no extra adapters.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔇</div>
+      <div class="feat-title">Completely silent</div>
+      <p class="feat-text">Zero electrical hum. Zero fan noise. Just clean, quiet light.</p>
+    </div>
+  </div>
+</section>
+
+<section class="specs" id="specs">
+  <div>
+    <h2 class="specs-title">Built to last<br>a decade.</h2>
+    <p style="color: var(--muted); font-size: 15px; line-height: 1.7;">Every material chosen for durability and repairability. We designed Lumino to be with you for years, not seasons.</p>
+  </div>
+  <ul class="specs-list">
+    <li><span class="key">Height</span><span class="val">42 cm adjustable</span></li>
+    <li><span class="key">Light source</span><span class="val">LED, 800 lm</span></li>
+    <li><span class="key">Color temp</span><span class="val">2700K – 6500K</span></li>
+    <li><span class="key">Lifespan</span><span class="val">50,000 hours</span></li>
+    <li><span class="key">Power</span><span class="val">12W max, USB-C</span></li>
+    <li><span class="key">Material</span><span class="val">Aluminium + beech wood</span></li>
+  </ul>
+</section>
+
+<section class="color-section" id="colors">
+  <h2 class="color-title">Choose your finish.</h2>
+  <p class="color-sub">Four colorways, all available now.</p>
+  <div class="color-swatches">
+    <div>
+      <div class="swatch active" style="background:#2a2a2a" onclick="setColor(this,'Matte Black','#2a2a2a')"></div>
+    </div>
+    <div>
+      <div class="swatch" style="background:#e8e3db" onclick="setColor(this,'Sand White','#e8e3db')"></div>
+    </div>
+    <div>
+      <div class="swatch" style="background:#8b9e8a" onclick="setColor(this,'Sage Green','#8b9e8a')"></div>
+    </div>
+    <div>
+      <div class="swatch" style="background:#c8a96e" onclick="setColor(this,'Warm Gold','#c8a96e')"></div>
+    </div>
+  </div>
+  <p class="swatch-name" id="colorName">Matte Black</p>
+</section>
+
+<footer>
+  <span>© 2026 Lumino Design Co.</span>
+  <span>Project by Yaroslav Tupikin · Portfolio</span>
+</footer>
+
+<script>
+  function setColor(el, name, hex) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('colorName').textContent = name;
+  }
+</script>
+</body>
+</html>

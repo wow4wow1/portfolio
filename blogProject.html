@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Readly — A Simple Blog</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fafaf8;
+    --ink: #18181b;
+    --muted: #71717a;
+    --light: #f4f4f0;
+    --border: #e4e4e0;
+    --tag-bg: #f0efeb;
+    --accent: #2563eb;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--bg);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .logo {
+    font-family: 'Newsreader', serif;
+    font-size: 1.6rem; font-style: italic; letter-spacing: -.01em;
+  }
+  .header-nav { display: flex; gap: 1.5rem; align-items: center; }
+  .header-nav a {
+    text-decoration: none; color: var(--muted);
+    font-size: 14px; transition: color .2s;
+  }
+  .header-nav a:hover { color: var(--ink); }
+  .search-box {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--light); border: 1px solid var(--border);
+    border-radius: 8px; padding: .4rem .8rem;
+    font-size: 13px; color: var(--muted); cursor: text;
+  }
+
+  /* HERO ARTICLE */
+  .hero-post {
+    padding: 4rem 2.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 400px; gap: 4rem; align-items: center;
+  }
+  .post-meta {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 1.25rem;
+  }
+  .tag {
+    background: var(--tag-bg);
+    font-size: 11px; font-weight: 500; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+    padding: .25rem .7rem; border-radius: 100px;
+  }
+  .post-date { font-size: 13px; color: var(--muted); }
+  .hero-title {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15; letter-spacing: -.02em; margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  .hero-excerpt { color: var(--muted); font-size: 16px; line-height: 1.75; margin-bottom: 1.5rem; }
+  .author-row { display: flex; align-items: center; gap: .75rem; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500; font-size: 13px;
+  }
+  .author-name { font-size: 14px; font-weight: 500; }
+  .author-read { font-size: 13px; color: var(--muted); }
+  .hero-img {
+    width: 100%; height: 300px; background: var(--light);
+    border-radius: 12px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+  }
+  .read-btn {
+    display: inline-block; margin-top: 1.5rem;
+    background: var(--ink); color: white;
+    padding: .7rem 1.75rem; border-radius: 100px;
+    font-size: 14px; text-decoration: none; font-weight: 500;
+    transition: background .2s;
+  }
+  .read-btn:hover { background: #333; }
+
+  /* FILTER */
+  .filter-row {
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;
+  }
+  .filter-label { font-size: 13px; color: var(--muted); }
+  .filter-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 100px; padding: .35rem 1rem;
+    font-size: 13px; cursor: pointer; color: var(--muted);
+    transition: all .2s; font-family: 'DM Sans', sans-serif;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--ink); color: white; border-color: var(--ink);
+  }
+
+  /* GRID */
+  .grid-section { padding: 3rem 2.5rem; }
+  .grid-title {
+    font-size: 13px; color: var(--muted);
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 2rem; font-weight: 400;
+  }
+  .posts-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2px;
+    background: var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .post-card {
+    background: var(--bg); padding: 1.75rem;
+    display: flex; flex-direction: column; gap: .75rem;
+    transition: background .2s; cursor: pointer;
+  }
+  .post-card:hover { background: white; }
+  .post-card .tag-row { display: flex; gap: .5rem; }
+  .post-card-title {
+    font-family: 'Newsreader', serif;
+    font-size: 1.15rem; line-height: 1.35;
+    font-weight: 300; letter-spacing: -.01em;
+  }
+  .post-card-excerpt { font-size: 13px; color: var(--muted); line-height: 1.65; flex: 1; }
+  .post-card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: .75rem; border-top: 1px solid var(--border);
+  }
+  .post-card-author { font-size: 12px; color: var(--muted); }
+  .post-card-time { font-size: 12px; color: var(--muted); }
+
+  /* NEWSLETTER */
+  .newsletter {
+    margin: 0 2.5rem 3rem;
+    background: var(--ink); border-radius: 16px;
+    padding: 3rem; text-align: center; color: white;
+  }
+  .nl-title {
+    font-family: 'Newsreader', serif;
+    font-size: 1.75rem; font-weight: 300; font-style: italic;
+    margin-bottom: .5rem; letter-spacing: -.01em;
+  }
+  .nl-sub { color: #a1a1aa; font-size: 15px; margin-bottom: 2rem; }
+  .nl-form { display: flex; gap: .75rem; justify-content: center; max-width: 400px; margin: 0 auto; }
+  .nl-input {
+    flex: 1; padding: .75rem 1.25rem;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 100px; color: white;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    outline: none;
+  }
+  .nl-input::placeholder { color: #71717a; }
+  .nl-input:focus { border-color: rgba(255,255,255,.4); }
+  .nl-btn {
+    background: white; color: var(--ink);
+    border: none; border-radius: 100px;
+    padding: .75rem 1.5rem; font-size: 14px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif;
+    transition: background .2s;
+  }
+  .nl-btn:hover { background: #e8e8e8; }
+  .nl-success { display: none; color: #86efac; font-size: 15px; margin-top: 1rem; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2.5rem;
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--muted); flex-wrap: wrap; gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-post { grid-template-columns: 1fr; }
+    .hero-img { height: 200px; font-size: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">Readly</span>
+  <nav class="header-nav">
+    <a href="#">Topics</a>
+    <a href="#">Writers</a>
+    <a href="#">About</a>
+    <span class="search-box">🔍 Search</span>
+  </nav>
+</header>
+
+<section class="hero-post">
+  <div>
+    <div class="post-meta">
+      <span class="tag">Design</span>
+      <span class="post-date">May 12, 2026</span>
+    </div>
+    <h1 class="hero-title">Why white space is the most underused tool in web design</h1>
+    <p class="hero-excerpt">Cluttered pages push users away. Learn how deliberate empty space can guide attention, improve readability, and make your layouts feel premium.</p>
+    <div class="author-row">
+      <div class="avatar" style="background:#dbeafe; color:#1d4ed8">AK</div>
+      <div>
+        <div class="author-name">Anna Kowalska</div>
+        <div class="author-read">8 min read</div>
+      </div>
+    </div>
+    <a href="#" class="read-btn">Read article →</a>
+  </div>
+  <div class="hero-img">🎨</div>
+</section>
+
+<div class="filter-row">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" onclick="setFilter(this,'All')">All</button>
+  <button class="filter-btn" onclick="setFilter(this,'Design')">Design</button>
+  <button class="filter-btn" onclick="setFilter(this,'Code')">Code</button>
+  <button class="filter-btn" onclick="setFilter(this,'Career')">Career</button>
+  <button class="filter-btn" onclick="setFilter(this,'Tools')">Tools</button>
+</div>
+
+<section class="grid-section">
+  <p class="grid-title">Latest articles</p>
+  <div class="posts-grid">
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Code</span></div>
+      <div class="post-card-title">CSS Grid vs Flexbox: when to use which one</div>
+      <p class="post-card-excerpt">A practical guide to choosing the right layout method for every situation — with real-world examples.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Piotr Nowak</span>
+        <span class="post-card-time">6 min</span>
+      </div>
+    </div>
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Career</span></div>
+      <div class="post-card-title">How I got my first frontend job with no degree</div>
+      <p class="post-card-excerpt">The exact steps, resources, and mindset shifts that helped me land a junior role after 8 months of self-study.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Marta W.</span>
+        <span class="post-card-time">10 min</span>
+      </div>
+    </div>
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Tools</span></div>
+      <div class="post-card-title">10 browser DevTools tricks every developer should know</div>
+      <p class="post-card-excerpt">Speed up your debugging workflow with these Chrome DevTools features that most developers overlook.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Igor S.</span>
+        <span class="post-card-time">5 min</span>
+      </div>
+    </div>
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Design</span></div>
+      <div class="post-card-title">Typography rules that make your text actually readable</div>
+      <p class="post-card-excerpt">Line height, font size, letter spacing — small tweaks that make a huge difference to how comfortable your content feels.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Anna K.</span>
+        <span class="post-card-time">7 min</span>
+      </div>
+    </div>
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Code</span></div>
+      <div class="post-card-title">Writing clean HTML that you won't regret in six months</div>
+      <p class="post-card-excerpt">Semantic tags, accessibility basics, and naming conventions to keep your markup maintainable long-term.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Tomasz L.</span>
+        <span class="post-card-time">8 min</span>
+      </div>
+    </div>
+
+    <div class="post-card">
+      <div class="tag-row"><span class="tag">Career</span></div>
+      <div class="post-card-title">What recruiters actually look for in a junior dev portfolio</div>
+      <p class="post-card-excerpt">I talked to 12 hiring managers. Here's what they told me — and what most candidates get completely wrong.</p>
+      <div class="post-card-footer">
+        <span class="post-card-author">Katarzyna B.</span>
+        <span class="post-card-time">9 min</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="newsletter">
+  <div class="nl-title">Get the best articles, weekly.</div>
+  <p class="nl-sub">No spam. No noise. Just quality writing delivered to your inbox.</p>
+  <div class="nl-form">
+    <input class="nl-input" type="email" placeholder="your@email.com" id="nlEmail">
+    <button class="nl-btn" onclick="subscribe()">Subscribe</button>
+  </div>
+  <p class="nl-success" id="nlSuccess">✓ You're in! Welcome to Readly.</p>
+</div>
+
+<footer>
+  <span>© 2026 Readly</span>
+  <span>Project by Yaroslav Tupikin · Portfolio</span>
+</footer>
+
+<script>
+  function setFilter(btn, cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function subscribe() {
+    const val = document.getElementById('nlEmail').value.trim();
+    if (!val || !val.includes('@')) return;
+    document.querySelector('.nl-form').style.display = 'none';
+    document.getElementById('nlSuccess').style.display = 'block';
+  }
+</script>
+</body>
+</html>
