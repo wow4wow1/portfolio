@@ -320,10 +320,13 @@
 
 <script>
   function setFilter(btn, cat) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.post-card').forEach(card => {
+    const tag = card.querySelector('.tag').textContent.trim();
+    card.style.display = (cat === 'All' || tag === cat) ? '' : 'none';
+  });
+}
   function subscribe() {
     const val = document.getElementById('nlEmail').value.trim();
     if (!val || !val.includes('@')) return;
