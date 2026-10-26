@@ -313,10 +313,12 @@
 
 <script>
   function setColor(el, name, hex) {
-    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('colorName').textContent = name;
-  }
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('colorName').textContent = name;
+  document.querySelectorAll('.lamp-svg line').forEach(l => l.setAttribute('stroke', hex));
+  document.querySelector('.lamp-svg ellipse').setAttribute('fill', hex);
+}
 </script>
 </body>
 </html>
