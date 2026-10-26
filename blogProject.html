@@ -54,6 +54,13 @@
     font-size: 13px; color: var(--muted); cursor: text;
   }
 
+  .search-box input {
+    border: none; background: none; outline: none;
+    font: inherit; color: var(--ink); width: 130px;
+  }
+  .empty-state { display: none; padding: 2rem; text-align: center; color: var(--muted); }
+  .filter-btn:focus-visible, .nl-btn:focus-visible, .search-box input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
   /* HERO ARTICLE */
   .hero-post {
     padding: 4rem 2.5rem 3rem;
@@ -190,8 +197,13 @@
   }
 
   @media (max-width: 768px) {
-    .hero-post { grid-template-columns: 1fr; }
+    header { padding: 1rem 1.25rem; flex-wrap: wrap; gap: .75rem; }
+    .header-nav { gap: 1rem; flex-wrap: wrap; }
+    .hero-post { grid-template-columns: 1fr; padding: 2.5rem 1.25rem; gap: 2rem; }
     .hero-img { height: 200px; font-size: 3rem; }
+    .filter-row, .grid-section, footer { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .newsletter { margin: 0 1.25rem 2rem; padding: 2rem 1.25rem; }
+    .nl-form { flex-direction: column; }
   }
 </style>
 </head>
@@ -203,7 +215,7 @@
     <a href="#">Topics</a>
     <a href="#">Writers</a>
     <a href="#">About</a>
-    <span class="search-box">🔍 Search</span>
+    <label class="search-box">🔍 <input id="searchInput" type="search" placeholder="Search articles" oninput="applyFilters()"></label>
   </nav>
 </header>
 
@@ -229,11 +241,11 @@
 
 <div class="filter-row">
   <span class="filter-label">Filter:</span>
-  <button class="filter-btn active" onclick="setFilter(this,'All')">All</button>
-  <button class="filter-btn" onclick="setFilter(this,'Design')">Design</button>
-  <button class="filter-btn" onclick="setFilter(this,'Code')">Code</button>
-  <button class="filter-btn" onclick="setFilter(this,'Career')">Career</button>
-  <button class="filter-btn" onclick="setFilter(this,'Tools')">Tools</button>
+  <button class="filter-btn active" data-cat="All" onclick="setFilter(this,'All')">All</button>
+  <button class="filter-btn" data-cat="Design" onclick="setFilter(this,'Design')">Design</button>
+  <button class="filter-btn" data-cat="Code" onclick="setFilter(this,'Code')">Code</button>
+  <button class="filter-btn" data-cat="Career" onclick="setFilter(this,'Career')">Career</button>
+  <button class="filter-btn" data-cat="Tools" onclick="setFilter(this,'Tools')">Tools</button>
 </div>
 
 <section class="grid-section">
@@ -301,6 +313,7 @@
     </div>
 
   </div>
+  <p class="empty-state" id="emptyState">No articles match. Try another category or search term.</p>
 </section>
 
 <div class="newsletter">
@@ -319,20 +332,36 @@
 </footer>
 
 <script>
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const cat = document.querySelector('.filter-btn.active').dataset.cat;
+    let visible = 0;
+    document.querySelectorAll('.post-card').forEach(card => {
+      const tag = card.querySelector('.tag').textContent.trim();
+      const text = card.textContent.toLowerCase();
+      const show = (cat === 'All' || tag === cat) && (!q || text.includes(q));
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('emptyState').style.display = visible ? 'none' : 'block';
+  }
+
   function setFilter(btn, cat) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.post-card').forEach(card => {
-    const tag = card.querySelector('.tag').textContent.trim();
-    card.style.display = (cat === 'All' || tag === cat) ? '' : 'none';
-  });
-}
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
   function subscribe() {
     const val = document.getElementById('nlEmail').value.trim();
-    if (!val || !val.includes('@')) return;
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    const input = document.getElementById('nlEmail');
+    input.style.borderColor = ok ? '' : '#f87171';
+    if (!ok) { input.placeholder = 'Enter a valid email'; return; }
     document.querySelector('.nl-form').style.display = 'none';
     document.getElementById('nlSuccess').style.display = 'block';
   }
+  document.getElementById('nlEmail').addEventListener('keydown', e => { if (e.key === 'Enter') subscribe(); });
 </script>
 </body>
 </html>
