@@ -92,8 +92,7 @@
     display: flex; justify-content: center; align-items: center;
   }
   .lamp-wrap {
-    width: 100%; max-width: 320px; 
-    height: 420px;
+    width: 100%; max-width: 320px; height: 420px;
     background: var(--white);
     border-radius: 24px;
     border: 1px solid var(--border);
@@ -204,7 +203,13 @@
     .hero { flex-direction: column; }
     .specs { grid-template-columns: 1fr; }
     .nav-links { display: none; }
+    nav { padding: 1rem 1.25rem; }
+    .hero, .features, .specs, .color-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .hero-visual { max-width: 100%; width: 100%; }
+    footer { padding: 1.5rem 1.25rem; }
   }
+  .swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .lamp-svg line, .lamp-svg ellipse { transition: stroke .3s, fill .3s; }
 </style>
 </head>
 <body>
@@ -292,16 +297,16 @@
   <p class="color-sub">Four colorways, all available now.</p>
   <div class="color-swatches">
     <div>
-      <div class="swatch active" style="background:#2a2a2a" onclick="setColor(this,'Matte Black','#2a2a2a')"></div>
+      <div class="swatch active" role="button" tabindex="0" aria-label="Matte Black" style="background:#2a2a2a" onclick="setColor(this,'Matte Black','#2a2a2a')"></div>
     </div>
     <div>
-      <div class="swatch" style="background:#e8e3db" onclick="setColor(this,'Sand White','#e8e3db')"></div>
+      <div class="swatch" role="button" tabindex="0" aria-label="Sand White" style="background:#e8e3db" onclick="setColor(this,'Sand White','#e8e3db')"></div>
     </div>
     <div>
-      <div class="swatch" style="background:#8b9e8a" onclick="setColor(this,'Sage Green','#8b9e8a')"></div>
+      <div class="swatch" role="button" tabindex="0" aria-label="Sage Green" style="background:#8b9e8a" onclick="setColor(this,'Sage Green','#8b9e8a')"></div>
     </div>
     <div>
-      <div class="swatch" style="background:#c8a96e" onclick="setColor(this,'Warm Gold','#c8a96e')"></div>
+      <div class="swatch" role="button" tabindex="0" aria-label="Warm Gold" style="background:#c8a96e" onclick="setColor(this,'Warm Gold','#c8a96e')"></div>
     </div>
   </div>
   <p class="swatch-name" id="colorName">Matte Black</p>
@@ -313,13 +318,31 @@
 </footer>
 
 <script>
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const c = v => Math.max(0, Math.min(255, v + amt));
+    const r = c(n >> 16), g = c((n >> 8) & 255), b = c(n & 255);
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
   function setColor(el, name, hex) {
-  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('colorName').textContent = name;
-  document.querySelectorAll('.lamp-svg line').forEach(l => l.setAttribute('stroke', hex));
-  document.querySelector('.lamp-svg ellipse').setAttribute('fill', hex);
-}
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('colorName').textContent = name;
+    document.querySelectorAll('.lamp-svg line').forEach(l => l.setAttribute('stroke', hex));
+    const ell = document.querySelectorAll('.lamp-svg ellipse');
+    ell[0].setAttribute('fill', shade(hex, -15));
+    ell[1].setAttribute('fill', hex);
+    document.querySelector('.lamp-base').style.background = shade(hex, -10);
+  }
+
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.click(); }
+    });
+  });
+  // initial state = Matte Black
+  setColor(document.querySelector('.swatch.active'), 'Matte Black', '#2a2a2a');
 </script>
 </body>
 </html>
